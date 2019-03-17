@@ -10,6 +10,11 @@ $css-vars-use-native: false !default;
 // enables the output of debug messages
 $css-vars-debug-log: false !default;
 
+// Determines whether the CSS vars are declared within the root element.
+// Setting this to `false` will cause the vars to be declared in the current
+// scope.
+$css-vars-at-root: true !default;
+
 //// FUNCTIONS ////
 
 ///
@@ -110,7 +115,18 @@ $css-vars-debug-log: false !default;
 
   @if ($css-vars-use-native) { // CSS variables
     // Native CSS: assign CSS custom properties to the global scope
-    @at-root :root {
+
+    @if ($css-vars-at-root) {
+      @at-root :root {
+        @each $varName, $varValue in $varMap {
+          @if (type_of($varValue)==string) {
+            #{$varName}: $varValue // to prevent quotes interpolation
+          } @else {
+            #{$varName}: #{$varValue}
+          }
+        }
+      }
+    } @else {
       @each $varName, $varValue in $varMap {
         @if (type_of($varValue)==string) {
           #{$varName}: $varValue // to prevent quotes interpolation
